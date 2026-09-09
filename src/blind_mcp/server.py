@@ -18,9 +18,9 @@ from typing import Any
 
 from mcp.server.mcpserver import MCPServer
 
-from . import blind_http, parse
+from . import __version__, blind_http, parse
 
-mcp = MCPServer("blind")
+mcp = MCPServer("blind", version=__version__)
 
 _STOPWORDS = {
     "the", "a", "an", "is", "are", "do", "does", "how", "what", "and", "or",
@@ -159,7 +159,10 @@ def _keywords(text: str) -> list[str]:
 def _resolve(company: str) -> str:
     """Blind company URLs are case-sensitive; try the plausible spellings."""
     seen = []
-    for name in (company, company.title(), company.capitalize(), company.upper()):
+    # Also try the slug form (spaces → hyphens) for multi-word names like
+    # "Goldman Sachs" → "goldman-sachs".
+    candidates = [company, company.title(), company.capitalize(), company.upper(), _slug(company)]
+    for name in candidates:
         if name in seen:
             continue
         seen.append(name)
