@@ -18,6 +18,14 @@ def test_no_module_shadows_stdlib():
     assert not offenders, f"package modules shadow stdlib: {offenders}"
 
 
+def test_read_post_reports_truncation():
+    """read_post must indicate when comments were truncated."""
+    import inspect
+    src = inspect.getsource(server.read_post)
+    assert "truncated" in src, "read_post should report whether comments were truncated"
+    assert "returned_comments" in src, "read_post should report how many comments were returned"
+
+
 def test_topic_matching_handles_synonyms():
     topics = ["india", "wlb", "layoffs", "interview", "rsu"]
     match = lambda q: server._match_topic(topics, set(server._keywords(q)))

@@ -221,11 +221,22 @@ def read_post(url: str, max_comments: int = 40) -> dict[str, Any]:
     Returns the body, Blind's own AI summary of the comment thread, and the
     comments with each commenter's employer -- which is how you weigh a claim
     (an answer from someone at the company differs from a passer-by).
+
+    ``comment_count`` counts replies in the schema block while ``comments``
+    holds only root comments with their replies nested; the two are therefore
+    not directly comparable. When the comment list is longer than
+    ``max_comments`` it is sliced to that many roots; the ``truncated`` flag
+    tells you this happened, and ``returned_comments`` tells you how many you
+    got. Raise ``max_comments`` deliberately for the long threads where the
+    real discussion lives.
     """
     if "/post/" not in url:
         raise ValueError("Expected a Blind post URL containing /post/.")
     post = parse.parse_post(blind_http.fetch(url))
+    total = len(post["comments"])
     post["comments"] = post["comments"][:max_comments]
+    post["truncated"] = total > max_comments
+    post["returned_comments"] = len(post["comments"])
     return post
 
 
