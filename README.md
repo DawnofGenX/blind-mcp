@@ -138,6 +138,12 @@ Two hard rules, both explained in CONTRIBUTING: **don't commit captured Blind
 pages** (fixtures are generated), and **don't weaken robots/cache/throttle** for
 speed.
 
+## Publishing
+
+`mcp-name: io.github.dheerajjha/blind-mcp`
+
+See [RELEASING.md](RELEASING.md).
+
 ## License
 
 MIT
