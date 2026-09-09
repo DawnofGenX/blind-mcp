@@ -1,16 +1,39 @@
 # blind-mcp
 
-An MCP server for researching companies on [Blind](https://www.teamblind.com) —
-so you can ask *"how many days a week is Roku India in the office, and how hard
-is it enforced?"* and get the actual threads instead of a search page full of
-referral spam.
+[![tests](https://github.com/dheerajjha/blind-mcp/actions/workflows/test.yml/badge.svg)](https://github.com/dheerajjha/blind-mcp/actions/workflows/test.yml)
+[![good first issues](https://img.shields.io/github/issues/dheerajjha/blind-mcp/good%20first%20issue?label=good%20first%20issues&color=7057ff)](https://github.com/dheerajjha/blind-mcp/issues?q=is%3Aopen+label%3A%22good+first+issue%22)
+[![python](https://img.shields.io/badge/python-3.10%2B-blue)](pyproject.toml)
+[![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
+**Ask an anonymous professional network what it's actually like to work
+somewhere — from your AI assistant.**
+
+[Blind](https://www.teamblind.com) is where people say the things they won't put
+on Glassdoor: whether the 4-day office policy is really enforced, what the
+parental leave actually is, whether a team is worth joining. But its own search
+is close to unusable — searching *"Roku India RTO"* returns twelve unrelated
+referral posts — so the answers sit there unreachable.
+
+This finds them.
 
 ```
 research(company="Roku", question="how many days in office in India")
-  -> topic_used: "india"
-  -> 4 threads, each with Blind's own AI comment summary and every
-     comment tagged with the commenter's employer
+
+  → "Roku India - Reviews"  ·  2026-03-31
+    AI summary: "...strictly enforced, with a mandatory four-day requirement,
+                 though exceptions are possible at a manager's discretion"
+
+    [Adobe]    "the wfo policy is enforced orgwide, you can take few times
+                wfh based on managers discretion"
+    [Carelon]  "Yes 4 days mandatory and its open culture"
 ```
+
+Every comment keeps its **employer tag** and **date**, because that's how you
+weigh an anonymous claim — an answer from someone at the company reads
+differently from a passer-by, and a 2021 answer about policy may simply be
+wrong now.
+
+**No login. No API key.** Every read path works logged out.
 
 ## Tools
 
@@ -105,8 +128,9 @@ Small project, easy to contribute to. The cheapest useful change is a **keyword
 alias** — one dict entry plus a test — and it's the change that most improves
 answers, because `research` only finds threads whose words match yours.
 
-Start with [`good first issue`](https://github.com/dheerajjha/blind-mcp/issues?q=is%3Aopen+label%3A%22good+first+issue%22),
-then [CONTRIBUTING.md](CONTRIBUTING.md). Issues are labelled by size (`size: XS`
+Start with [**good first issues**](.github/GOOD_FIRST_ISSUES.md) — nine open,
+all real and reproduced, each one saying where the code is and how to test the
+fix — then [CONTRIBUTING.md](CONTRIBUTING.md). Issues are labelled by size (`size: XS`
 is under 30 minutes) and `mentored` means ask questions in the thread and
 you'll get walked through it. First review within 48 hours.
 

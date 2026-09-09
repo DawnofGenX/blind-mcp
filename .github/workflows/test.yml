@@ -1,0 +1,44 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - name: Install
+        run: uv sync --all-extras --dev
+      - name: Test
+        # No network: every fixture is generated, so a red run is a real failure.
+        run: uv run pytest -q
+
+  fixtures:
+    # Fixtures are generated, never captured. If regenerating them changes the
+    # committed bytes, the generator and the fixtures have drifted apart.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv sync --dev
+      - name: Regenerate fixtures
+        run: uv run python tests/fixtures/make_fixtures.py
+      - name: Tests still pass against freshly generated fixtures
+        run: uv run pytest -q
+      - name: No captured Blind pages committed
+        run: |
+          if grep -rlI "teamblind.com/post/" tests/fixtures/ --include="*.gz" 2>/dev/null; then
+            echo "::error::A captured Blind page appears to be committed."
+            exit 1
+          fi
+          echo "OK: fixtures contain no captured post URLs"
