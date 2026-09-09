@@ -1,0 +1,17 @@
+{
+  "apps": [
+    {
+      "name": "blind-mcp",
+      "script": "blind-mcp",
+      "interpreter": "none",
+      "args": "--http --host 127.0.0.1 --port 8790",
+      "autorestart": true,
+      "max_restarts": 10,
+      "restart_delay": 2000,
+      "kill_timeout": 5000,
+      "env": {
+        "BLIND_MCP_CACHE_TTL": "21600"
+      }
+    }
+  ]
+}

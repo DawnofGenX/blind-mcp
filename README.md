@@ -1,0 +1,104 @@
+# blind-mcp
+
+An MCP server for researching companies on [Blind](https://www.teamblind.com) —
+so you can ask *"how many days a week is Roku India in the office, and how hard
+is it enforced?"* and get the actual threads instead of a search page full of
+referral spam.
+
+```
+research(company="Roku", question="how many days in office in India")
+  -> topic_used: "india"
+  -> 4 threads, each with Blind's own AI comment summary and every
+     comment tagged with the commenter's employer
+```
+
+## Tools
+
+| Tool | What it does |
+| --- | --- |
+| `company_topics(company)` | The topics Blind itself suggests for a company — for Roku: `india`, `wlb`, `culture`, `layoffs`, `interview`, `rsu`, … |
+| `company_posts(company, topic=, page=, limit=)` | Post listings, optionally scoped to one topic |
+| `find(company, keyword)` | Search a company's posts by keyword — `find("Intuit", "maternity")` returns exactly the 7 maternity threads |
+| `read_post(url, max_comments=)` | One thread in full: body, Blind's AI summary, comments with employers |
+| `research(company, question, max_posts=)` | One-shot: picks the topic, ranks its posts against the question, returns the top threads in full |
+
+## Install
+
+```bash
+uv sync
+```
+
+Register with Claude Code:
+
+```bash
+uv tool install --editable .          # puts `blind-mcp` on PATH
+claude mcp add --scope user blind -- blind-mcp
+```
+
+Or in `claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "blind": {
+      "command": "uv",
+      "args": ["run", "--directory", "/path/to/blind-mcp", "blind-mcp"]
+    }
+  }
+}
+```
+
+## Do I need to log in?
+
+**No — and you probably shouldn't.** This was measured, not assumed:
+
+- Post bodies, full comment threads, Blind's AI comment summaries, company
+  listings, topic pages, reviews and salary pages **all return HTTP 200
+  anonymously**, with no gating.
+- Driving an authenticated session with automation tripped Blind's anomaly
+  detection after roughly six navigations: `Automatic Logout — we noticed a
+  login from a new device or location (code 2009)`, with a redirect to
+  `/session-out`.
+
+So a cookie buys no extra read access and costs you session stability. The only
+thing it would unlock is company-internal channels, which are gated to verified
+employees of that company.
+
+If you still want it, set `BLIND_COOKIE` to your session cookie header (copy it
+from a logged-in browser request in DevTools). There is no login flow — the
+server only replays a cookie you supply, read once at startup and attached to
+each request. It is off by default, and the client raises immediately if Blind
+invalidates it rather than silently returning logged-out HTML.
+
+The cookie itself is never written to disk, but responses fetched with it are
+cached under a separate `auth/` directory so authenticated and anonymous
+results can never be served for each other. Don't commit the cookie.
+
+## Being a good citizen
+
+Blind's `robots.txt` disallows `/search/` for every user-agent, so **this server
+has no search tool** and refuses to fetch that path. It also:
+
+- sends an honest `User-Agent` (no browser impersonation — Blind serves it a 200 anyway)
+- caches every response on disk for 6h, so repeat questions cost zero requests
+- spaces requests ~1.5s apart
+- fetches `robots.txt` first and fails closed if it can't be read
+
+Configure via `BLIND_MCP_CACHE_DIR`, `BLIND_MCP_CACHE_TTL`,
+`BLIND_MCP_MIN_INTERVAL`, `BLIND_MCP_USER_AGENT`.
+
+Blind's Terms of Service restrict automated access. This reads public pages at
+human pace for personal research; bulk crawling is both a ToS problem and, given
+that Blind's value rests on anonymity, a privacy one. Don't build a dataset of
+posts joined to employers and nicknames.
+
+## Reading the output
+
+Blind is anonymous and unverified. Weight claims by the commenter's employer
+(`company` on each comment) and treat a single loud voice as one data point. In
+testing, the Roku India RTO answer was corroborated by two independent
+commenters *and* an unrelated Glassdoor review — that's when it's worth trusting.
+
+## License
+
+MIT
