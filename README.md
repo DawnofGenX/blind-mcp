@@ -99,6 +99,21 @@ Blind is anonymous and unverified. Weight claims by the commenter's employer
 testing, the Roku India RTO answer was corroborated by two independent
 commenters *and* an unrelated Glassdoor review — that's when it's worth trusting.
 
+## Contributing
+
+Small project, easy to contribute to. The cheapest useful change is a **keyword
+alias** — one dict entry plus a test — and it's the change that most improves
+answers, because `research` only finds threads whose words match yours.
+
+Start with [`good first issue`](https://github.com/dheerajjha/blind-mcp/issues?q=is%3Aopen+label%3A%22good+first+issue%22),
+then [CONTRIBUTING.md](CONTRIBUTING.md). Issues are labelled by size (`size: XS`
+is under 30 minutes) and `mentored` means ask questions in the thread and
+you'll get walked through it. First review within 48 hours.
+
+Two hard rules, both explained in CONTRIBUTING: **don't commit captured Blind
+pages** (fixtures are generated), and **don't weaken robots/cache/throttle** for
+speed.
+
 ## License
 
 MIT
