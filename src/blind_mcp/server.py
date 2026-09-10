@@ -18,7 +18,7 @@ from typing import Any
 
 from mcp.server.mcpserver import MCPServer
 
-from . import http, parse
+from . import blind_http, parse
 
 mcp = MCPServer("blind")
 
@@ -164,7 +164,7 @@ def _resolve(company: str) -> str:
             continue
         seen.append(name)
         try:
-            http.fetch(f"/company/{name}/posts")
+            blind_http.fetch(f"/company/{name}/posts")
             return name
         except Exception:
             continue
@@ -179,7 +179,7 @@ def company_topics(company: str) -> dict[str, Any]:
     culture, layoffs, interview, rsu. Use one as the `topic` for company_posts.
     """
     name = _resolve(company)
-    meta = parse.parse_company_topics(http.fetch(f"/company/{name}/posts"))
+    meta = parse.parse_company_topics(blind_http.fetch(f"/company/{name}/posts"))
     prefix = f"{_slug(name)}-"
     return {
         "company": name,
@@ -204,7 +204,7 @@ def company_posts(
     if page > 1:
         path += f"?page={page}"
 
-    posts = parse.parse_listing(http.fetch(path))
+    posts = parse.parse_listing(blind_http.fetch(path))
     return {
         "company": name,
         "topic": topic,
@@ -224,7 +224,7 @@ def read_post(url: str, max_comments: int = 40) -> dict[str, Any]:
     """
     if "/post/" not in url:
         raise ValueError("Expected a Blind post URL containing /post/.")
-    post = parse.parse_post(http.fetch(url))
+    post = parse.parse_post(blind_http.fetch(url))
     post["comments"] = post["comments"][:max_comments]
     return post
 
@@ -243,7 +243,7 @@ def find(company: str, keyword: str, limit: int = 25) -> dict[str, Any]:
     generic listing, so an empty result is a real answer.
     """
     name = _resolve(company)
-    html = http.fetch(f"/company/{name}/posts/{_slug(name)}-{_slug(keyword)}")
+    html = blind_http.fetch(f"/company/{name}/posts/{_slug(name)}-{_slug(keyword)}")
     return {
         "company": name,
         "keyword": keyword,

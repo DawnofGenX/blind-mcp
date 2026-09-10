@@ -2,7 +2,20 @@
 
 from __future__ import annotations
 
+import sys
+from pathlib import Path
+
 from blind_mcp import server
+
+
+def test_no_module_shadows_stdlib():
+    """A package module named like a stdlib top-level (e.g. http.py) shadows
+    it when the package dir lands on sys.path (running server.py directly),
+    breaking `import http.client` inside third-party deps. Guard against it."""
+    pkg_dir = Path(server.__file__).parent
+    stdlib = set(sys.stdlib_module_names)
+    offenders = [p.stem for p in pkg_dir.glob("*.py") if p.stem in stdlib]
+    assert not offenders, f"package modules shadow stdlib: {offenders}"
 
 
 def test_topic_matching_handles_synonyms():
