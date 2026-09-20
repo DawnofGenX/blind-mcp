@@ -6,6 +6,22 @@ import sys
 from pathlib import Path
 
 from blind_mcp import server
+from blind_mcp import __version__
+
+
+def test_server_version_matches_package():
+    """The MCP server handshake must report the package version."""
+    assert server.mcp.version == __version__
+    assert server.mcp.version != ""
+
+
+def test_resolve_tries_slug_form():
+    """_resolve must try the slug form for multi-word company names."""
+    import inspect
+    src = inspect.getsource(server._resolve)
+    assert "_slug(company)" in src or "_slug(" in src, (
+        "_resolve should try the slug form for multi-word names like 'Goldman Sachs'"
+    )
 
 
 def test_no_module_shadows_stdlib():
